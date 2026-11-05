@@ -5,7 +5,7 @@
 | **Duración** | sesión 2 (simulación) + trabajo en casa (solo simulación) + turno con robots en la sesión 3 |
 | **Se programa** | `robcoop_lab/auction_law.py` (cuatro funciones cortas) |
 | **Entrega** | una semana después de la sesión 3: etiqueta `p2` en GitHub + zip y PDF en el campus virtual |
-| **Peso** | 35 % de la nota de prácticas |
+| **Peso** | 25 % de la nota de prácticas |
 
 ## Objetivos
 
@@ -25,9 +25,9 @@
 | S2 1:15–1:45 | 2. Primera subasta en Gazebo | Disposición A, primera gráfica |
 | S2 1:45–3:40 | 3. Criterios y disposiciones · 4. Comparación | Experimentos A, B, C y tabla de métodos |
 | S2 (turnos) | Robots reales de la **P1** (25 min por pareja) | Mientras, el resto sigue con la P2 |
-| S2 3:40–4:00 | Puesta en común y presentación del reto | |
+| S2 3:40–4:00 | Puesta en común y qué se hará en la sesión 3 | |
 | Casa | Terminar los pasos 3 y 4 (solo simulación) e informe de la P1 | |
-| S3 (turnos) | 5. Robots reales de la P2 (30 min por pareja, junto con el ensayo del reto) | `real_C_*` |
+| S3 (turnos) | 5. Robots reales de la P2 (30 min por pareja, mientras el resto empieza la P3) | `real_C_*` |
 
 ---
 
@@ -225,7 +225,7 @@ figura con las rutas (`.png`) en `resultados/p2`.
 * Opcional: cambiad `best_insertion` para que solo añada al final de la ruta y repetid `compare_p2`.
   ¿Cuánto empeora? (dejadlo como estaba antes de entregar).
 
-## Paso 5 · Robots reales (sesión 3, turno de 30 min junto con el ensayo del reto)
+## Paso 5 · Robots reales (sesión 3, turno de 30 min)
 
 En la arena están las marcas de salida de la P1 y los 6 puntos de la disposición **C** con cinta.
 
@@ -283,7 +283,8 @@ Comparación simulación / real: `ros2 run robcoop_lab plot_p2 sim_C_suma.csv re
 | Informe: resultados y análisis | 3 | Tablas con números, criterios y métodos comparados con razones, sim/real |
 
 **Opcional (hasta +1 en la nota de prácticas):** detectar la caída de un robot por su latido
-(`/tb3_i/heartbeat`, 2 Hz) y volver a subastar sus tareas pendientes. Es lo que pide el reto.
+(`/tb3_i/heartbeat`, 2 Hz) y volver a subastar sus tareas pendientes. El latido se usará en el reto
+final de la sesión 4.
 
 ## Si algo falla
 

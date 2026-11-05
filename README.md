@@ -12,7 +12,8 @@ ROS 2 y la simulación multi-robot) está en
 |---|---|---|
 | P1 · Formación por consenso | [docs/P1_consenso.md](docs/P1_consenso.md) | `robcoop_lab/consensus_law.py` |
 | P2 · Asignación de tareas por subasta | [docs/P2_subasta.md](docs/P2_subasta.md) | `robcoop_lab/auction_law.py` |
-| P3 · Integración y reto final | (próximamente) | |
+| P3 · Cobertura con Voronoi | (próximamente) | |
+| Reto final (sesión 4) | (próximamente) | |
 
 ## Estructura
 
