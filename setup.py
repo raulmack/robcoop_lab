@@ -6,7 +6,7 @@ package_name = 'robcoop_lab'
 
 setup(
     name=package_name,
-    version='1.0.0',
+    version='1.1.0',
     packages=[package_name],
     data_files=[
         ('share/ament_index/resource_index/packages', ['resource/' + package_name]),
@@ -29,6 +29,12 @@ setup(
             'check_p1 = robcoop_lab.check_p1:main',
             'kinsim = robcoop_lab.kinsim:main',
             'graph_info = robcoop_lab.graphs:main',
+            'auction_node = robcoop_lab.auction_node:main',
+            'auctioneer_node = robcoop_lab.auctioneer_node:main',
+            'plot_p2 = robcoop_lab.plot_p2:main',
+            'compare_p2 = robcoop_lab.compare_p2:main',
+            'check_p2 = robcoop_lab.check_p2:main',
+            'kinsim_p2 = robcoop_lab.kinsim_p2:main',
         ],
     },
 )
