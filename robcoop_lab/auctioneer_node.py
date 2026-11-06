@@ -31,6 +31,7 @@ from std_msgs.msg import Bool, String
 from visualization_msgs.msg import Marker, MarkerArray
 
 from . import auction_core, auction_law
+from .arena import START_POSES
 from .auction_node import AUCTION_QOS, to_msg
 from .kinematics import control_point
 from .robot_api import RobotInterface
@@ -57,6 +58,7 @@ class AuctioneerNode(Node):
         p('timeout', 300.0)                 # s de ejecución como máximo
         p('bid_timeout', 2.0)               # s de espera de las pujas de una ronda
         p('execute', True)                  # False: solo subasta, sin mover los robots
+        p('check_marks', True)              # comprobar que los robots salen de sus marcas
         g = lambda n: self.get_parameter(n).value  # noqa: E731
 
         self.robots = list(g('robots'))
@@ -69,6 +71,8 @@ class AuctioneerNode(Node):
         self.timeout = float(g('timeout'))
         self.bid_timeout = float(g('bid_timeout'))
         self.execute = bool(g('execute'))
+        self.check_marks = bool(g('check_marks'))
+        self.mode = g('mode')
         self.meta = {'robots': self.robots, 'tasks': {k: list(v) for k, v in self.tasks.items()},
                      'layout': g('layout'), 'criterion': self.criterion, 'mode': g('mode')}
         stamp = time.strftime('%Y%m%d_%H%M%S')
@@ -127,6 +131,38 @@ class AuctioneerNode(Node):
 
     def _remaining(self):
         return [n for n in self.tasks if n not in self.owner]
+
+    # --- Salida desde las marcas ---------------------------------------------------------
+    MARK_TOL = 0.15                         # m
+
+    def _off_marks(self, poses):
+        """[(robot, distancia a su marca), ...] de los robots que NO están en su marca."""
+        off = []
+        for r, p in zip(self.robots, poses):
+            try:
+                i = int(r.rsplit('_', 1)[1])
+            except (IndexError, ValueError):
+                continue
+            if p is None or not 0 <= i < len(START_POSES):
+                continue
+            d = math.hypot(p[0] - START_POSES[i][0], p[1] - START_POSES[i][1])
+            if d > self.MARK_TOL:
+                off.append((r, d))
+        return off
+
+    def _abort_off_marks(self, off):
+        """Los resultados no valdrían (ni para comparar con la referencia ni con los reales)."""
+        self.done = True
+        lista = ', '.join(f'{r} a {d:.2f} m' for r, d in off)
+        if self.mode == 'real':
+            fix = ('Colocad los robots en sus marcas, Ctrl+C en la terminal de p2_real '
+                   'y relanzadla (el anclaje se hace al arrancar).')
+        else:
+            fix = ('Probablemente siguen donde acabó el experimento anterior: Ctrl+C en la '
+                   'terminal de p2_sim, relanzadla y repetid este experimento.')
+        self.get_logger().error(
+            f'Los robots no están en sus marcas de salida ({lista}). No se hace la subasta ni '
+            f'se guarda nada. {fix}')
 
     # --- Subasta --------------------------------------------------------------------------
     def _announce(self):
@@ -199,6 +235,11 @@ class AuctioneerNode(Node):
                 self.ready_since = now
             if now - self.ready_since < 1.0:
                 return
+            if self.execute and self.check_marks:
+                off = self._off_marks(poses)
+                if off:
+                    self._abort_off_marks(off)
+                    return
             self.t0 = now
             self.start_poses = {r: p for r, p in zip(self.robots, poses)}
             self.phase = 'subasta'

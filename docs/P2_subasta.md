@@ -181,7 +181,10 @@ Mirad los mensajes de una ronda en otra terminal mientras se repite el experimen
 `ros2 topic echo /auction/bid`. Con `ejecutar:=false` se hace solo la subasta (los robots no se
 mueven), útil para ver las rondas sin esperar.
 
-> **Para repetir desde las marcas:** Ctrl+C en la terminal 1 y volver a lanzar.
+> **Para repetir desde las marcas:** Ctrl+C en la terminal 1 y volver a lanzar. Al acabar un
+> experimento los robots se quedan donde terminaron; si no relanzáis, el siguiente saldría de ahí y sus
+> números no se podrían comparar con la referencia ni con los robots reales. Por eso el subastador
+> comprueba que cada robot está a menos de 15 cm de su marca y, si no, cancela sin guardar nada.
 
 > **Si los robots no se mueven** y en la terminal 2 sale «el LiDAR marca 0.12 m en todos los rayos», el LiDAR
 > simulado no funciona con la GPU de vuestro PC (pasa con algunas tarjetas). Relanzad la simulación con
@@ -189,7 +192,8 @@ mueven), útil para ver las rondas sin esperar.
 
 ## Paso 3 · Criterios y disposiciones (en simulación; se puede terminar en casa)
 
-Seis experimentos, relanzando la simulación antes de cada uno:
+Seis experimentos. **Antes de cada uno, Ctrl+C en la terminal 1 y relanzad `p2_sim`** (los robots
+tienen que salir de sus marcas; si no, el subastador cancela el experimento):
 
 ```bash
 ros2 launch robcoop_lab p2_subasta.launch.py disposicion:=A criterio:=suma nombre:=sim_A_suma
@@ -300,6 +304,7 @@ final de la sesión 4.
 | Síntoma | Causa probable y solución |
 |---|---|
 | Los robots no avanzan y sale «el LiDAR marca 0.12 m en todos los rayos» | El LiDAR simulado no mide con la GPU de ese PC: cerrad la simulación y relanzadla con `render:=software` (más lenta, pero funciona) |
+| «Los robots no están en sus marcas de salida» y el experimento acaba sin guardar | Siguen donde acabó el experimento anterior: Ctrl+C en la terminal 1, relanzad `p2_sim` y repetid el experimento. En real: colocadlos en las marcas y relanzad `p2_real` |
 | `Package 'robcoop_lab' not found` o no existe `check_p2` | Falta compilar tras el paso 0: `cb` |
 | `choose_winner no devuelve ninguna puja` y el experimento acaba | Falta programar `choose_winner` |
 | Se queda en `Esperando a: tb3_…` | La simulación no está lanzada, falta un robot o mezcla de `[SIM]` y `[REAL]` |
@@ -307,3 +312,5 @@ final de la sesión 4.
 | El experimento acaba por `tiempo agotado` | Un robot no ha llegado a una tarea; mirad su trayectoria en la gráfica |
 | En real, los robots no van a los puntos de cinta | Robots mal colocados en sus marcas al lanzar `p2_real` |
 | En real, el robot sigue moviéndose al cerrar | `ros2 run robcoop_lab parar` y avisad al profesor |
+| Vuestro repositorio no está en este PC (p. ej. hicisteis la P1 en otro) | Como en la P1: `gh auth login`, `git config --global user.name/user.email` y `git clone` de vuestro repo en `~/robcoop-docker/ws/src`; después, el paso 0 |
+| El profesor publica un arreglo en la plantilla cuando ya habéis programado | **No** repitáis el comando del paso 0 tal cual: sobrescribiría vuestra `auction_law.py` con la vacía. Añadid también vuestro fichero a la lista de excluidos: `git fetch plantilla` y `git checkout plantilla/main -- . ':!robcoop_lab/consensus_law.py' ':!robcoop_lab/formations.py' ':!robcoop_lab/graphs.py' ':!robcoop_lab/auction_law.py' ':!resultados'`; luego `cb`. Si ya os ha pasado y no habéis hecho commit: `git checkout HEAD -- robcoop_lab/auction_law.py`; si ya hicisteis commit, buscad el vuestro con `git log --oneline -- robcoop_lab/auction_law.py` y `git checkout <commit> -- robcoop_lab/auction_law.py` |
