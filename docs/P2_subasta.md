@@ -135,6 +135,11 @@ Abrid `ws/src/robcoop_lab/robcoop_lab/auction_law.py` en VS Code y completad los
 3. `choose_winner(bids)`: puja más baja, con la regla de desempate del enunciado.
 4. `hungarian(cost)`: asignación óptima de una tarea por robot con `linear_sum_assignment`.
 
+Si no habéis usado mucho Python, mirad antes las tres diapositivas «Python que vais a necesitar»:
+`math.dist`, cortes de listas (`route[:k] + [t] + route[k:]`), comparación de tuplas con `min`,
+`math.inf` / `math.isfinite`, comprensión de listas, `numpy`, `zip` e `int`. Para `hungarian` hay que
+añadir arriba `from scipy.optimize import linear_sum_assignment`: la plantilla no trae esa importación.
+
 Comprobar, sin ROS:
 
 ```bash
@@ -177,6 +182,10 @@ Mirad los mensajes de una ronda en otra terminal mientras se repite el experimen
 mueven), útil para ver las rondas sin esperar.
 
 > **Para repetir desde las marcas:** Ctrl+C en la terminal 1 y volver a lanzar.
+
+> **Si los robots no se mueven** y en la terminal 2 sale «el LiDAR marca 0.12 m en todos los rayos», el LiDAR
+> simulado no funciona con la GPU de vuestro PC (pasa con algunas tarjetas). Relanzad la simulación con
+> `ros2 launch robcoop_lab p2_sim.launch.py render:=software`: Gazebo dibuja por software y el LiDAR mide bien.
 
 ## Paso 3 · Criterios y disposiciones (en simulación; se puede terminar en casa)
 
@@ -290,6 +299,7 @@ final de la sesión 4.
 
 | Síntoma | Causa probable y solución |
 |---|---|
+| Los robots no avanzan y sale «el LiDAR marca 0.12 m en todos los rayos» | El LiDAR simulado no mide con la GPU de ese PC: cerrad la simulación y relanzadla con `render:=software` (más lenta, pero funciona) |
 | `Package 'robcoop_lab' not found` o no existe `check_p2` | Falta compilar tras el paso 0: `cb` |
 | `choose_winner no devuelve ninguna puja` y el experimento acaba | Falta programar `choose_winner` |
 | Se queda en `Esperando a: tb3_…` | La simulación no está lanzada, falta un robot o mezcla de `[SIM]` y `[REAL]` |

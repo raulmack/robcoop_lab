@@ -17,7 +17,7 @@ from rclpy.time import Time
 from sensor_msgs.msg import LaserScan
 from tf2_ros import Buffer, TransformException, TransformListener
 
-from .safety import SafetyFilter
+from .safety import SafetyFilter, scan_is_degenerate
 
 MAP_FRAME = 'map'
 
@@ -46,8 +46,17 @@ class RobotInterface:
         self._cmd_pub = None
         if command:
             self._cmd_pub = node.create_publisher(Twist, f'/{self.ns}/cmd_vel', 10)
-            node.create_subscription(LaserScan, f'/{self.ns}/scan', self.safety.update_scan,
+            node.create_subscription(LaserScan, f'/{self.ns}/scan', self._on_scan,
                                      qos_profile_sensor_data)
+
+    def _on_scan(self, msg):
+        self.safety.update_scan(msg)
+        if scan_is_degenerate(msg):
+            self.node.get_logger().warn(
+                f'{self.ns}: el LiDAR marca {msg.range_min:.2f} m en todos los rayos, es decir, '
+                'NO está midiendo (no se esquivarán obstáculos). En simulación: cerrad la '
+                'simulación y relanzadla con render:=software. Con el robot real: avisad al '
+                'profesor.', throttle_duration_sec=10.0)
 
     def pose(self):
         """(x, y, θ) del robot en 'map' con la última TF disponible, o None."""

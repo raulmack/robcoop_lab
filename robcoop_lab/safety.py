@@ -11,18 +11,34 @@ from .kinematics import V_MAX, W_MAX, wrap
 
 STOP_DIST = 0.20                 # m, medido desde el centro del LiDAR
 SECTOR = math.radians(35)        # semiancho del sector vigilado
+MIN_MARGIN = 0.005               # m: lecturas a range_min + MIN_MARGIN o menos no son válidas
 
 
 def min_range_in_sector(ranges, angle_min, angle_increment, range_min, center):
-    """Distancia mínima válida en el sector [center - SECTOR, center + SECTOR]."""
+    """Distancia mínima válida en el sector [center - SECTOR, center + SECTOR].
+
+    Las lecturas iguales al mínimo del sensor se ignoran: un LiDAR que no mide (p. ej. el
+    simulado en algunas GPU) devuelve range_min en todos los rayos y bloquearía el robot.
+    """
     best = math.inf
     for i, r in enumerate(ranges):
-        if not math.isfinite(r) or r < range_min:
+        if not math.isfinite(r) or r <= range_min + MIN_MARGIN:
             continue
         a = wrap(angle_min + i * angle_increment - center)
         if abs(a) <= SECTOR and r < best:
             best = r
     return best
+
+
+def scan_is_degenerate(scan):
+    """True si TODOS los rayos marcan el mínimo del sensor: el LiDAR no está midiendo.
+
+    (Los ceros del LDS-01 real, que significan «sin eco», no cuentan.)
+    """
+    if scan is None or not scan.ranges:
+        return False
+    lo, hi = scan.range_min - 1e-3, scan.range_min + MIN_MARGIN
+    return all(math.isfinite(r) and lo <= r <= hi for r in scan.ranges)
 
 
 class SafetyFilter:

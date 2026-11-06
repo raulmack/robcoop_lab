@@ -283,6 +283,7 @@ Si falta un robot, trabajad con 3: `robots:=tb3_0,tb3_1,tb3_2` en los dos lanzam
 
 | Síntoma | Causa probable y solución |
 |---|---|
+| Los robots no avanzan y sale «el LiDAR marca 0.12 m en todos los rayos» | El LiDAR simulado no mide con la GPU de ese PC: cerrad la simulación y relanzadla con `p1_sim.launch.py render:=software` (más lenta, pero funciona) |
 | `Package 'robcoop_lab' not found` | Falta compilar: `cb` |
 | El experimento se queda en `Esperando a: tb3_…` | La simulación no está lanzada, o una terminal está en `[SIM]` y otra en `[REAL]` |
 | Los robots no se mueven y `check_p1` falla | La ley devuelve ceros: completad `consensus_velocity` |

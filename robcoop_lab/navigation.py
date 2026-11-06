@@ -44,10 +44,10 @@ def scan_points(scan, max_range=R_AVOID, step=2):
     if scan is None:
         return []
     pts = []
-    rmin = max(scan.range_min, 0.05)
+    rmin = max(scan.range_min, 0.05) + 0.005      # lecturas en el mínimo: no válidas
     for i in range(0, len(scan.ranges), step):
         r = scan.ranges[i]
-        if math.isfinite(r) and rmin <= r < max_range:
+        if math.isfinite(r) and rmin < r < max_range:
             a = scan.angle_min + i * scan.angle_increment
             pts.append((r * math.cos(a), r * math.sin(a)))
     return pts
