@@ -267,7 +267,8 @@ Si falta un robot, trabajad con 3: `robots:=tb3_0,tb3_1,tb3_2` en los dos lanzam
    ```bash
    cd ~/robcoop-docker/ws/src/robcoop_lab
    git archive --format=zip -o ~/p1_<apellido1>_<apellido2>.zip p1
-   cp ~/p1_*.zip /mnt/c/Users/<usuario_windows>/Downloads/   # para subirlo desde Windows
+   WIN=$(wslpath "$(cmd.exe /c 'echo %USERPROFILE%' 2>/dev/null | tr -d '\r')")   # vuestra carpeta de Windows
+   cp ~/p1_*.zip "$WIN/Downloads/"                                   # para subirlo desde Windows
    ```
 
 ### Evaluación (sobre 10)
