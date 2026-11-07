@@ -181,6 +181,13 @@ Mirad los mensajes de una ronda en otra terminal mientras se repite el experimen
 `ros2 topic echo /auction/bid`. Con `ejecutar:=false` se hace solo la subasta (los robots no se
 mueven), útil para ver las rondas sin esperar.
 
+**Grafo de nodos para el informe.** En una tercera terminal (`./robcoop.sh shell`), con la
+simulación en marcha, lanzad `ros2 run rqt_graph rqt_graph` y repetid un experimento
+(C dura unos 20 s). Mientras los robots se mueven: desplegable **Nodes/Topics (all)**, botón de
+refrescar y, si queda muy cargado, marcad **Hide: tf**. Guardadlo con el icono *Save as image* en
+`~/ws/src/robcoop_lab/resultados/p2/grafo.png`. Si el experimento lo hacéis solo para la captura,
+borrad después sus ficheros (`rm resultados/p2/<nombre>.*`).
+
 > **Para repetir desde las marcas:** Ctrl+C en la terminal 1 y volver a lanzar. Al acabar un
 > experimento los robots se quedan donde terminaron; si no relanzáis, el siguiente saldría de ahí y sus
 > números no se podrían comparar con la referencia ni con los robots reales. Por eso el subastador

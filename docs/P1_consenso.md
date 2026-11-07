@@ -161,6 +161,11 @@ logarítmica.
 > **Para repetir desde las marcas:** Ctrl+C en la terminal 1 y volver a lanzar (unos 15 s). Los
 > robots no vuelven solos a su sitio.
 
+**Grafo de nodos para el informe.** En una tercera terminal (`./robcoop.sh shell`), con la
+simulación en marcha, lanzad `ros2 run rqt_graph rqt_graph` y repetid un experimento. Mientras se
+ejecuta: desplegable **Nodes/Topics (all)**, botón de refrescar y, si queda muy cargado, marcad
+**Hide: tf**. Guardadlo con el icono *Save as image* en `~/ws/src/robcoop_lab/resultados/p1/grafo.png`.
+
 ## Paso 4 · Influencia de la topología (55 min)
 
 Repetid el experimento con las cuatro topologías, relanzando la simulación antes de cada una, y
