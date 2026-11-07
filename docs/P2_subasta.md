@@ -269,22 +269,34 @@ Comparación simulación / real: `ros2 run robcoop_lab plot_p2 sim_C_suma.csv re
 
 **Plazo:** una semana después de la sesión 3.
 
+Todo en la terminal de Ubuntu, **fuera del contenedor** (sin `[SIM]`/`[REAL]` en el prompt).
+
 1. **Código y resultados en GitHub.** `auction_law.py` y la carpeta `resultados/p2` (CSV, JSON, PNG
    y tablas `.md` que uséis en el informe):
    ```bash
+   cd ~/robcoop-docker/ws/src/robcoop_lab
+   git status -s                          # los resultados nuevos salen con ??
    git add -A && git commit -m "P2: entrega" && git push
    git tag p2 && git push origin p2
+   git ls-remote --tags origin            # tiene que aparecer refs/tags/p2
    ```
-2. **Informe en PDF** (3 páginas como máximo) con la plantilla `docs/plantilla_informe_P2.docx`:
+   Si cambiáis algo después de etiquetar (por ejemplo, al añadir los experimentos reales de la
+   sesión 3): commit y push, y moved la etiqueta con `git tag -f p2 && git push -f origin p2`.
+2. **Informe en PDF** (3 páginas como máximo) con la plantilla `docs/plantilla_informe_P2.docx`
+   (desde Windows: `\\wsl$\<distro>\home\<usuario>\robcoop-docker\ws\src\robcoop_lab\docs`):
    * tabla de métodos de `compare_p2` (A, B y C; y las tres aleatorias en una frase o tabla);
    * tabla de los seis experimentos en Gazebo y los dos reales (tiempo total y distancia recorrida);
    * figura de rutas de los métodos y figuras de B con los dos criterios;
    * respuestas razonadas a las preguntas de los pasos 3 y 4 y análisis simulación / real.
 3. **Campus virtual.** Una entrega por pareja con el PDF y el zip del código etiquetado:
    ```bash
-   cd ~/robcoop-docker/ws/src/robcoop_lab
    git archive --format=zip -o ~/p2_<apellido1>_<apellido2>.zip p2
+   python3 -m zipfile -l ~/p2_*.zip | grep -E "auction_law|resultados/p2"   # comprobad que están
+   WIN=$(wslpath "$(cmd.exe /c 'echo %USERPROFILE%' 2>/dev/null | tr -d '\r')")   # vuestra carpeta de Windows
+   cp ~/p2_*.zip "$WIN/Downloads/"                                   # para subirlo desde Windows
    ```
+   Se evalúa lo que hay en la etiqueta `p2`: si los resultados no están en GitHub con la etiqueta, no
+   cuentan.
 
 ### Evaluación (sobre 10)
 
@@ -312,5 +324,6 @@ final de la sesión 4.
 | El experimento acaba por `tiempo agotado` | Un robot no ha llegado a una tarea; mirad su trayectoria en la gráfica |
 | En real, los robots no van a los puntos de cinta | Robots mal colocados en sus marcas al lanzar `p2_real` |
 | En real, el robot sigue moviéndose al cerrar | `ros2 run robcoop_lab parar` y avisad al profesor |
-| Vuestro repositorio no está en este PC (p. ej. hicisteis la P1 en otro) | Como en la P1: `gh auth login`, `git config --global user.name/user.email` y `git clone` de vuestro repo en `~/robcoop-docker/ws/src`; después, el paso 0 |
+| Vuestro repositorio no está en este PC (p. ej. hicisteis la P1 en otro) | Como en la P1: `gh auth login`, `gh auth setup-git`, `git config --global user.name/user.email` y `git clone` de vuestro repo en `~/robcoop-docker/ws/src`; después, el paso 0 |
+| `git push` o `git ls-remote`: «Invalid username or token» / «Authentication failed» | Git no está usando el token de `gh`: `gh auth status` (si no estáis conectados, `gh auth login`) y después `gh auth setup-git`; repetid el comando |
 | El profesor publica un arreglo en la plantilla cuando ya habéis programado | **No** repitáis el comando del paso 0 tal cual: sobrescribiría vuestra `auction_law.py` con la vacía. Añadid también vuestro fichero a la lista de excluidos: `git fetch plantilla` y `git checkout plantilla/main -- . ':!robcoop_lab/consensus_law.py' ':!robcoop_lab/formations.py' ':!robcoop_lab/graphs.py' ':!robcoop_lab/auction_law.py' ':!resultados'`; luego `cb`. Si ya os ha pasado y no habéis hecho commit: `git checkout HEAD -- robcoop_lab/auction_law.py`; si ya hicisteis commit, buscad el vuestro con `git log --oneline -- robcoop_lab/auction_law.py` y `git checkout <commit> -- robcoop_lab/auction_law.py` |
