@@ -161,7 +161,9 @@ Abrid `ws/src/robcoop_lab/robcoop_lab/coverage_law.py` en VS Code y completad lo
 Las cuatro se hacen con `numpy` sin recorrer las casillas una a una. Si no lo habéis usado mucho,
 mirad antes las diapositivas «Python que vais a necesitar»: arrays (M, 2) y `axis=1`,
 `np.linalg.norm`, máscaras booleanas (`d_i <= d_j`, `mask & otra`, `points[mask]`), `np.sum`,
-`np.minimum`, `np.full(M, np.inf)` y devolver `None`.
+`np.minimum`, `np.full(M, np.inf)` y devolver `None`. Las diapositivas «Las funciones, dibujadas»
+muestran con una rejilla de 6 × 6 casillas qué hace cada función paso a paso y en qué orden las
+llama el nodo de cada robot.
 
 Comprobar, sin ROS:
 
@@ -175,8 +177,15 @@ ros2 run robcoop_lab kinsim_p3 --salida agrupados --densidad zona --plot
 
 `check_p3` comprueba las funciones con casos hechos a mano y con la rejilla real, repite con ellas
 el algoritmo de Lloyd ideal (deben salir los costes esperados y H no puede subir nunca) y simula
-el despliegue con robots diferenciales, también con zona de interés y con una avería. Guardad el
-avance: `git add -A && git commit -m "P3: coverage_law" && git push`.
+el despliegue con robots diferenciales, también con zona de interés y con una avería.
+
+**Guardad el avance en la terminal de Ubuntu, fuera del contenedor** (sin `[SIM]` en el prompt).
+Dentro del contenedor `git` no sabe quiénes sois y el commit falla con «Author identity unknown»:
+
+```bash
+cd ~/robcoop-docker/ws/src/robcoop_lab
+git add -A && git commit -m "P3: coverage_law" && git push
+```
 
 ## Paso 2 · Primer despliegue en Gazebo (30 min)
 
@@ -195,7 +204,7 @@ ros2 launch robcoop_lab p3_cobertura.launch.py nombre:=sim_uniforme
 El nodo del experimento espera a los 3 robots, comprueba que están en una posición de salida,
 activa la cobertura y **termina solo** cuando el equipo se ha desplegado (o a los 120 s). En RViz
 se ve la zona repartida en celdas (cada una con el color de su robot), el centroide de cada celda
-(esfera) y, arriba, el coste H y el error `e = max |C_i − p_i|`. Al final escribe el resumen y
+(esfera) y, arriba, la fase, el coste H y el error `e = max |C_i − p_i|`. Al final escribe el resumen y
 guarda `resultados/p3/sim_uniforme.csv` y `.json`. Debe salir algo parecido a esto: desplegados en
 unos 11 s y H de 9.45 a 5.37 m⁴ (el Lloyd ideal llega a 5.36). Gráficas:
 
@@ -203,13 +212,20 @@ unos 11 s y H de 9.45 a 5.37 m⁴ (el Lloyd ideal llega a 5.36). Gráficas:
 ros2 run robcoop_lab plot_p3 ~/ws/src/robcoop_lab/resultados/p3/sim_uniforme.csv
 ```
 
+Para ver las figuras desde Windows (y llevarlas al informe), abrid la carpeta de resultados en el
+Explorador desde la terminal de Ubuntu, fuera del contenedor:
+`explorer.exe "$(wslpath -w ~/robcoop-docker/ws/src/robcoop_lab/resultados/p3)"`.
+
 Mirad lo que publica un robot mientras se repite el experimento: `ros2 topic echo
 /tb3_0/coverage/state`.
 
-**Grafo de nodos para el informe.** Como en la P2: en una tercera terminal, con la simulación en
-marcha, `ros2 run rqt_graph rqt_graph` y repetid el experimento. Mientras los robots se mueven:
-desplegable **Nodes/Topics (all)**, refrescar y **Hide: tf**. Guardadlo en
-`~/ws/src/robcoop_lab/resultados/p3/grafo.png`.
+**Grafo de nodos para el informe.** En una tercera terminal (dentro del contenedor), con la
+simulación en marcha: `ros2 run rqt_graph rqt_graph --clear-config` (sin `--clear-config` puede
+abrirse partido en dos ventanas que no responden). **Antes** de lanzar el experimento elegid
+**Nodes/Topics (all)** y marcad **Hide: tf** (si no, las flechas de `/tf` tapan todo). Repetid el
+experimento con `k:=0.1 nombre:=sim_k01`, que dura unos 50 s, y en cuanto salga «Cobertura
+ACTIVADA» pulsad refrescar. Guardadlo con el icono *Save as image* como
+`/home/ros/ws/src/robcoop_lab/resultados/p3/grafo.png` (no con el nombre que propone).
 
 > **Para repetir desde la salida:** Ctrl+C en la terminal 1 y volver a lanzar. Al acabar un
 > experimento los robots se quedan donde terminaron; el nodo del experimento comprueba que cada
@@ -233,6 +249,11 @@ Para el tercero, los robots salen juntos de una esquina. En la terminal 1:
 ```bash
 ros2 launch robcoop_lab p3_cobertura.launch.py nombre:=sim_agrupados
 ```
+
+**Después de cada experimento, mirad en el resumen la línea `salida …` y el H inicial**: 9.45 m⁴
+desde las marcas y 31.07 m⁴ desde `agrupados`. Si el nombre del experimento dice una salida y los
+robots han salido de otra (lo típico: relanzar `p3_sim` con la flecha arriba y sin
+`salida:=agrupados`), el experimento avisa con «OJO» al empezar y en el resumen: repetidlo.
 
 Figura comparativa de las tres ganancias y tabla resumen:
 
@@ -259,7 +280,7 @@ ros2 launch robcoop_lab p3_cobertura.launch.py fallo:=tb3_1 nombre:=sim_fallo
 
 Con `densidad:=zona` aparece en RViz un círculo amarillo en la zona de interés. Con
 `fallo:=tb3_1`, cuando el equipo ya se ha desplegado, `tb3_1` se para y deja de publicar su
-posición: en la terminal se ve cómo los otros dos lo dan por caído («no responde: lo excluyo») y
+posición (en RViz aparece `AVERIADO` en rojo encima de él): en la terminal se ve cómo los otros dos lo dan por caído («no responde: lo excluyo») y
 se recolocan. `plot_p3` de cada uno escribe, además de la figura, la tabla de celdas finales (área
 y masa de cada celda).
 
@@ -378,6 +399,9 @@ averiará y los demás tendrán que recolocarse, como en `sim_fallo`.
 | Los robots no avanzan y sale «el LiDAR marca 0.12 m en todos los rayos» | El LiDAR simulado no mide con la GPU de ese PC: cerrad la simulación y relanzadla con `render:=software` |
 | «Los robots no están en una posición de salida» y el experimento acaba sin guardar | Siguen donde acabó el experimento anterior: Ctrl+C en la terminal 1, relanzad `p3_sim` y repetid. En real: colocadlos en las marcas y relanzad `p3_real` |
 | `Package 'robcoop_lab' not found` o no existe `check_p3` | Falta compilar tras el paso 0: `cb` |
+| `git commit` falla con «Author identity unknown» | Estáis dentro del contenedor (`[SIM]` en el prompt). Las órdenes `git` van en la terminal de Ubuntu, fuera: `exit` o abrid otra terminal |
+| «OJO: el nombre … dice «agrupados», pero los robots salen de «marcas»» | Se lanzó `p3_sim` sin `salida:=agrupados` (o al revés). Ctrl+C, relanzad `p3_sim` con la salida correcta y repetid el experimento: se sobrescribe |
+| `rqt_graph` se abre en dos ventanas, una vacía, y no responde | Recupera una configuración guardada que falla en WSL: cerradlo y lanzadlo con `ros2 run rqt_graph rqt_graph --clear-config`. Si aun así no va, captura de pantalla con Win + Mayús + S |
 | Se queda en `Esperando a: tb3_…` | La simulación no está lanzada, falta un robot o mezcla de `[SIM]` y `[REAL]` |
 | El resumen dice «OJO: vuestra coverage_cost da … y la de referencia …» | `coverage_cost` está mal (¿falta ΔA o el cuadrado?): pasad `check_p3` |
 | El experimento acaba por `tiempo agotado` | El equipo no ha llegado a 2 cm de sus centroides: mirad el error en la gráfica. Con k muy baja hace falta más tiempo (`timeout:=200`) |

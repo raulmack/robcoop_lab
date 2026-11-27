@@ -109,7 +109,8 @@ def plot(results, out, density):
     rng = np.random.default_rng(0)
     for r in results:
         x = r['n'] + rng.uniform(-0.15, 0.15, size=len(r['costs']))
-        ax2.plot(x, 100 * (r['costs'] / r['best'] - 1), '.', color='#0082c8', alpha=0.6)
+        ax2.plot(x, 100 * (r['costs'] / r['best'] - 1), 'o', ms=3.5, color='#0082c8', alpha=0.6,
+                 label=f'{len(r["costs"])} salidas al azar' if r['n'] == ns[0] else None)
         for k, (name, c) in enumerate(r['named'].items()):
             ax2.plot(r['n'], 100 * (c / r['best'] - 1), ['s', '^'][k % 2], color=COLORS[k * 3],
                      ms=8, mfc='none', mew=2, label=f'desde {name}' if r['n'] == 1 else None)
@@ -117,7 +118,7 @@ def plot(results, out, density):
     ax2.set_ylabel('H final respecto al mejor (%)')
     ax2.set_xticks(ns)
     ax2.grid(True, alpha=0.4)
-    ax2.legend(fontsize=8, title='· salidas al azar', title_fontsize=8)
+    ax2.legend(fontsize=8)
     fig.suptitle(f'Algoritmo de Lloyd ideal · densidad {density}', fontsize=10)
     fig.tight_layout()
     fig.savefig(out, dpi=130)

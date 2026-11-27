@@ -220,6 +220,14 @@ class CoverageExperiment(Node):
             self.enable_pub.publish(Bool(data=True))
             self.get_logger().info(f'>>> Cobertura ACTIVADA (salida: {start}; experimento '
                                    f'"{self.name}")')
+            # Aviso si el nombre dice otra salida (p. ej. sim_agrupados lanzado desde las marcas)
+            self.name_warning = None
+            other = [s for s in ('marcas', 'agrupados') if s != start and s in self.name.lower()]
+            if other and start != 'libre':
+                self.name_warning = (f'el nombre "{self.name}" dice «{other[0]}», pero los robots '
+                                     f'salen de «{start}». ¿Falta salida:={other[0]} al lanzar '
+                                     'p3_sim?')
+                self.get_logger().warn('OJO: ' + self.name_warning)
 
         t = now - self.t0
         if any(p is None for p in poses):
@@ -324,6 +332,19 @@ class CoverageExperiment(Node):
                 m.scale.x = m.scale.y = m.scale.z = 0.09
                 m.color.r, m.color.g, m.color.b = COLORS[i % len(COLORS)]
                 m.color.a = 1.0
+            else:
+                m.action = Marker.DELETE
+            arr.markers.append(m)
+
+        # Robot averiado (excluido por los demás): rótulo rojo encima de su última posición
+        for i, r in enumerate(self.robots):
+            m = marker(i, Marker.TEXT_VIEW_FACING, 'averiado')
+            if r not in active and r in q:
+                m.pose.position.x, m.pose.position.y, m.pose.position.z = (float(q[r][0]),
+                                                                           float(q[r][1]), 0.35)
+                m.scale.z = 0.14
+                m.color.r, m.color.g, m.color.b, m.color.a = 1.0, 0.2, 0.2, 1.0
+                m.text = 'AVERIADO'
             else:
                 m.action = Marker.DELETE
             arr.markers.append(m)
@@ -441,6 +462,8 @@ class CoverageExperiment(Node):
             lines.append(f'  avería de {self.fail} en t = {self.t_fail:.1f} s: H sube a '
                          f'{self.cost_after_fail:.2f} m⁴; recolocados en {tr}, H = '
                          f'{m["cost_final"]:.2f} m⁴   (Lloyd ideal: {lloyd_fail:.2f})')
+        if getattr(self, 'name_warning', None):
+            lines.append(f'  OJO: {self.name_warning}')
         lines.append(f'  distancia media de un punto a su robot: {m["rms_initial"]:.2f} -> '
                      f'{m["rms_final"]:.2f} m')
         for r in self.robots:
