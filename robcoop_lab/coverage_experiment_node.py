@@ -347,12 +347,16 @@ class CoverageExperiment(Node):
             ring.action = Marker.DELETE
         arr.markers.append(ring)
 
-        txt = marker(0, Marker.TEXT_VIEW_FACING, 'texto')
-        txt.pose.position.x, txt.pose.position.y, txt.pose.position.z = 0.0, L + 0.25, 0.1
-        txt.scale.z = 0.16
-        txt.color.r = txt.color.g = txt.color.b = txt.color.a = 1.0
-        txt.text = f'{self.phase}   H = {cost:.2f} m4   e = {100 * err:.0f} cm'
-        arr.markers.append(txt)
+        # RViz dibuja cada espacio casi tan ancho como cuatro letras: un rótulo por dato, sin
+        # espacios, en ASCII y en posiciones fijas encima de la zona
+        tokens = (self.phase, f'H={cost:.2f}m4', f'e={100 * err:.0f}cm')
+        for k, (x, t) in enumerate(zip((-1.0, 0.15, 1.15), tokens)):
+            txt = marker(k, Marker.TEXT_VIEW_FACING, 'texto')
+            txt.pose.position.x, txt.pose.position.y, txt.pose.position.z = x, L + 0.25, 0.1
+            txt.scale.z = 0.13
+            txt.color.r = txt.color.g = txt.color.b = txt.color.a = 1.0
+            txt.text = t
+            arr.markers.append(txt)
         self.marker_pub.publish(arr)
 
     # --- Final ----------------------------------------------------------------------------

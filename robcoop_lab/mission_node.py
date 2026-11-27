@@ -655,22 +655,34 @@ class MissionNode(Node):
                 m.text = 'AVERIADO'
                 arr.markers.append(m)
 
-        label = {'espera': 'espera', 'formacion': 'FASE 1 · formación',
-                 'subasta': 'FASE 2 · subasta', 'confirmacion': 'FASE 2 · subasta',
-                 'inspeccion': 'FASE 2 · inspección', 'cobertura': 'FASE 3 · cobertura',
-                 'espera_averia': 'esperando la avería', 'averia': 'FASE 4 · avería',
+        # RViz dibuja cada espacio casi tan ancho como cuatro letras y puede no tener tildes ni '·':
+        # un rótulo por dato, sin espacios, en ASCII y en posiciones fijas (dos líneas)
+        label = {'espera': 'espera', 'formacion': 'FASE1:formacion',
+                 'subasta': 'FASE2:subasta', 'confirmacion': 'FASE2:subasta',
+                 'inspeccion': 'FASE2:inspeccion', 'cobertura': 'FASE3:cobertura',
+                 'espera_averia': 'esperando:averia', 'averia': 'FASE4:averia',
                  'pausa': 'pausa'}.get(phase, phase)
+        detail = []
         if phase == 'formacion' and self.err_form is not None:
-            label += f'   e = {100 * self.err_form:.0f} cm'
+            detail = [f'e={100 * self.err_form:.0f}cm']
         elif phase == 'inspeccion':
-            label += f'   {len(self.reached)}/{len(self.tasks)} puntos'
+            detail = [f'{len(self.reached)}/{len(self.tasks)}puntos']
         elif coverage:
-            label += f'   H = {self.cover[2]:.2f} m4   e = {100 * self.cover[3]:.0f} cm'
-        txt = marker(0, Marker.TEXT_VIEW_FACING, 'texto')
-        txt.pose.position.x, txt.pose.position.y, txt.pose.position.z = 0.0, 1.95, 0.1
-        txt.scale.z = 0.16
-        txt.text = f'{label}   [{self._score()["total"]:.0f} puntos · {self._t():.0f} s]'
-        arr.markers.append(txt)
+            detail = [f'H={self.cover[2]:.2f}m4', f'e={100 * self.cover[3]:.0f}cm']
+        line1 = [label, f'{self._score()["total"]:.0f}puntos', f'{self._t():.0f}s']
+        slots = ([(x, 2.15, 0.13, t) for x, t in zip((-0.9, 0.55, 1.35), line1)]
+                 + [(x, 1.95, 0.11, None) for x in (-0.45, 0.55)])
+        for k, t in enumerate(detail):
+            slots[3 + k] = slots[3 + k][:3] + (t,)
+        for k, (x, y, sz, t) in enumerate(slots):
+            txt = marker(k, Marker.TEXT_VIEW_FACING, 'texto')
+            if t is None:
+                txt.action = Marker.DELETE
+            else:
+                txt.pose.position.x, txt.pose.position.y, txt.pose.position.z = x, y, 0.1
+                txt.scale.z = sz
+                txt.text = t
+            arr.markers.append(txt)
         self.marker_pub.publish(arr)
 
     # --- Final --------------------------------------------------------------------------------
