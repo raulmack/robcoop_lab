@@ -262,6 +262,7 @@ Si falta un robot, trabajad con 3: `robots:=tb3_0,tb3_1,tb3_2` en los dos lanzam
    ```
 2. **Informe en PDF** (3 páginas como máximo) con la plantilla `docs/plantilla_informe_P1.docx`.
    Debe incluir, como mínimo:
+   * grafo de nodos y tópicos con los 4 robots (`resultados/p1/grafo.png`, paso 3);
    * tabla de las cuatro topologías: λ2 calculado, k, t_conv y error final;
    * figura comparativa del error con las cuatro topologías;
    * una figura de formación y la de la perturbación, con t_reconv;

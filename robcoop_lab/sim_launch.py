@@ -1,4 +1,4 @@
-"""Piezas comunes de p1_sim y p2_sim (proporcionado).
+"""Piezas comunes de p1_sim, p2_sim y p3_sim (proporcionado).
 
 Gazebo se lanza con turtlebot3_gz_bringup y RViz aparte, para poder elegir el render:
 
@@ -21,8 +21,11 @@ from . import arena
 RENDERS = ('gpu', 'software')
 
 
-def sim_actions(context, n, rviz_config=None):
-    """Acciones para lanzar n robots en las marcas (y RViz con rviz_config(robots), si se da)."""
+def sim_actions(context, n, rviz_config=None, poses=None):
+    """Acciones para lanzar n robots en las marcas (y RViz con rviz_config(robots), si se da).
+
+    poses: cadena 'x,y,yaw; ...' con otras posiciones de salida (por defecto, las marcas).
+    """
     arg = lambda name: LaunchConfiguration(name).perform(context)  # noqa: E731
     render = arg('render').lower()
     if render not in RENDERS:
@@ -31,7 +34,8 @@ def sim_actions(context, n, rviz_config=None):
                            'launch', 'multi_robot.launch.py')
     gazebo = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(bringup),
-        launch_arguments={'num_robots': str(n), 'world': 'empty', 'poses': arena.poses_arg(n),
+        launch_arguments={'num_robots': str(n), 'world': 'empty',
+                          'poses': poses or arena.poses_arg(n),
                           'gui': arg('gui'), 'rviz': 'false'}.items())
     actions = []
     if render == 'software':

@@ -6,7 +6,7 @@ package_name = 'robcoop_lab'
 
 setup(
     name=package_name,
-    version='1.1.0',
+    version='1.3.0',
     packages=[package_name],
     data_files=[
         ('share/ament_index/resource_index/packages', ['resource/' + package_name]),
@@ -35,6 +35,18 @@ setup(
             'compare_p2 = robcoop_lab.compare_p2:main',
             'check_p2 = robcoop_lab.check_p2:main',
             'kinsim_p2 = robcoop_lab.kinsim_p2:main',
+            'coverage_node = robcoop_lab.coverage_node:main',
+            'coverage_experiment = robcoop_lab.coverage_experiment_node:main',
+            'plot_p3 = robcoop_lab.plot_p3:main',
+            'compare_p3 = robcoop_lab.compare_p3:main',
+            'check_p3 = robcoop_lab.check_p3:main',
+            'kinsim_p3 = robcoop_lab.kinsim_p3:main',
+            'agent_node = robcoop_lab.agent_node:main',
+            'mission_node = robcoop_lab.mission_node:main',
+            'averia = robcoop_lab.fail_robot:main',
+            'plot_p4 = robcoop_lab.plot_p4:main',
+            'check_p4 = robcoop_lab.check_p4:main',
+            'kinsim_p4 = robcoop_lab.kinsim_p4:main',
         ],
     },
 )
