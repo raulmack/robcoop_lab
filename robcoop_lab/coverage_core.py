@@ -87,8 +87,9 @@ def density(name='uniforme', points=None, center=ZONE_CENTER, sigma=ZONE_SIGMA, 
     """Importancia φ(q) de cada punto de la rejilla: array (M,).
 
     uniforme  φ = 1 en toda la zona: todos los puntos importan lo mismo.
-    zona      φ = 1 + (peak − 1) · exp(−|q − center|² / (2 sigma²)): hay una zona de interés
-              alrededor de 'center' en la que los puntos importan hasta 'peak' veces más.
+    zona      φ = 1 + (peak − 1) · Σ_j exp(−|q − c_j|² / (2 sigma²)): una o varias zonas de
+              interés; alrededor de cada centro c_j los puntos importan hasta 'peak' veces más.
+              center: (x, y) para una zona, o (x1, y1, x2, y2, ...) para varias.
     """
     if points is None:
         points = make_grid()[0]
@@ -96,9 +97,27 @@ def density(name='uniforme', points=None, center=ZONE_CENTER, sigma=ZONE_SIGMA, 
     if name == 'uniforme':
         return np.ones(len(points))
     if name == 'zona':
-        d2 = np.sum((points - np.asarray(center, dtype=float)) ** 2, axis=1)
-        return 1.0 + (float(peak) - 1.0) * np.exp(-d2 / (2.0 * float(sigma) ** 2))
+        centers = np.asarray(center, dtype=float).reshape(-1, 2)          # (K, 2): K zonas
+        d2 = np.sum((points[:, None, :] - centers[None, :, :]) ** 2, axis=2)  # (M, K)
+        bumps = np.exp(-d2 / (2.0 * float(sigma) ** 2)).sum(axis=1)
+        return 1.0 + (float(peak) - 1.0) * bumps
     raise ValueError(f'Densidad desconocida: {name}. Opciones: {", ".join(DENSITIES)}')
+
+
+def parse_centers(text):
+    """'x,y' o 'x1,y1;x2,y2;...' -> [x1, y1, x2, y2, ...] (centros de las zonas de interés)."""
+    out = []
+    for part in str(text).split(';'):
+        if not part.strip():
+            continue
+        xy = [float(v) for v in part.split(',')]
+        if len(xy) != 2:
+            raise ValueError('centro debe ser "x,y" o varios separados por ";", p. ej. '
+                             '"0.6,-0.6;-0.8,0.8"')
+        out += xy
+    if not out:
+        raise ValueError('centro vacío: pon "x,y"')
+    return out
 
 
 # --- Lo que hace UN robot en cada ciclo, con el código del alumno ----------------------------

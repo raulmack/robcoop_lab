@@ -112,7 +112,9 @@ agrupados  los tres robots juntos en una esquina de la zona (solo en simulación
 ```
 
 Zona de interés (`densidad:=zona`): centrada en (0.6, −0.6), de unos 0.5 m de radio y 12 veces más
-importante que el resto. Se puede cambiar con `centro:="x,y"`, `sigma:=` y `pico:=`.
+importante que el resto. Se puede cambiar con `centro:="x,y"`, `sigma:=` y `pico:=`. Con varias
+zonas, sus centros separados por `;`: `centro:="0.6,-0.6;-0.8,0.8"` (todas con el mismo `sigma` y
+`pico`). Para probarlo sin ROS: `ros2 run robcoop_lab kinsim_p3 --densidad zona --centro "0.6,-0.6;-0.8,0.8"`.
 
 El despliegue se da por terminado cuando todos los robots están a menos de **2 cm** de su centroide
 durante **3 s** seguidos. No hay evitación de obstáculos: cada robot va en línea recta hacia un
@@ -386,7 +388,10 @@ Todo en la terminal de Ubuntu, **fuera del contenedor** (sin `[SIM]`/`[REAL]` en
 
 **Opcional (hasta +1 en la nota de prácticas):** repetid los experimentos `uniforme` y `zona` con
 4 robots (`p3_sim.launch.py num_robots:=4` y `robots:=tb3_0,tb3_1,tb3_2,tb3_3`) y con una zona
-de interés vuestra (`centro`, `sigma`, `pico`), y analizad cómo se reparten áreas y masas.
+de interés vuestra (`centro`, `sigma`, `pico`), y analizad cómo se reparten áreas y masas. Probad
+también **dos zonas de interés** con 3 y con 4 robots, por ejemplo
+`densidad:=zona centro:="0.6,-0.6;-0.8,0.8"`: ¿cuántos robots acaban en cada zona y por qué? ¿Cambia
+si salen de `agrupados`?
 
 En el reto final de la sesión 4 ([P4](P4_reto.md)) la cobertura es la última fase: un robot se
 averiará y los demás tendrán que recolocarse, como en `sim_fallo`.

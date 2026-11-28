@@ -357,16 +357,21 @@ class CoverageExperiment(Node):
             border.points.append(Point(x=x, y=y, z=0.01))
         arr.markers.append(border)
 
-        ring = marker(0, Marker.LINE_STRIP, 'zona de interes')
+        # Zonas de interés: una circunferencia de radio sigma alrededor de cada centro
         if self.meta['density'] == 'zona':
-            (cx, cy), s = self.meta['center'], self.meta['sigma']
-            ring.scale.x = 0.03
-            ring.color.r, ring.color.g, ring.color.b, ring.color.a = 1.0, 0.9, 0.0, 1.0
-            for a in np.linspace(0.0, 2 * math.pi, 41):
-                ring.points.append(Point(x=cx + s * math.cos(a), y=cy + s * math.sin(a), z=0.02))
+            s = self.meta['sigma']
+            for j, (cx, cy) in enumerate(np.asarray(self.meta['center'], dtype=float).reshape(-1, 2)):
+                ring = marker(j, Marker.LINE_STRIP, 'zona de interes')
+                ring.scale.x = 0.03
+                ring.color.r, ring.color.g, ring.color.b, ring.color.a = 1.0, 0.9, 0.0, 1.0
+                for a in np.linspace(0.0, 2 * math.pi, 41):
+                    ring.points.append(Point(x=float(cx + s * math.cos(a)), y=float(cy + s * math.sin(a)),
+                                             z=0.02))
+                arr.markers.append(ring)
         else:
+            ring = marker(0, Marker.LINE_STRIP, 'zona de interes')
             ring.action = Marker.DELETE
-        arr.markers.append(ring)
+            arr.markers.append(ring)
 
         # RViz dibuja cada espacio casi tan ancho como cuatro letras: un rótulo por dato, sin
         # espacios, en ASCII y en posiciones fijas encima de la zona

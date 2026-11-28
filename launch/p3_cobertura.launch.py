@@ -9,13 +9,14 @@ se ha desplegado o al agotar el tiempo.
     ros2 launch robcoop_lab p3_cobertura.launch.py k:=0.1 nombre:=sim_k01
     ros2 launch robcoop_lab p3_cobertura.launch.py densidad:=zona
     ros2 launch robcoop_lab p3_cobertura.launch.py densidad:=zona centro:="-0.5,0.5" sigma:=0.4
+    ros2 launch robcoop_lab p3_cobertura.launch.py densidad:=zona centro:="0.6,-0.6;-0.8,0.8"
     ros2 launch robcoop_lab p3_cobertura.launch.py fallo:=tb3_1
     ros2 launch robcoop_lab p3_cobertura.launch.py modo:=real nombre:=real_uniforme
 
 Argumentos:
     robots      tb3_0,tb3_1,tb3_2     (2 a 4, en el orden de las marcas)
     densidad    uniforme | zona       (zona: hay una zona de interés, ver coverage_core.py)
-    centro      "x,y" de la zona de interés (0.6,-0.6)
+    centro      "x,y" de la zona de interés (0.6,-0.6); varias: "x1,y1;x2,y2"
     sigma       tamaño de la zona de interés en m (0.5)
     pico        importancia del centro de la zona respecto al resto (12)
     k           ganancia de u_i = k (C_i − p_i) (0.5)
@@ -53,9 +54,7 @@ def setup(context, *args, **kwargs):
     fail = arg('fallo').strip().strip('/')
     if fail and fail not in robots:
         raise ValueError(f'fallo debe ser uno de los robots: {", ".join(robots)}')
-    center = [float(v) for v in arg('centro').split(',')[:2]]
-    if len(center) != 2:
-        raise ValueError('centro debe ser "x,y"')
+    center = coverage_core.parse_centers(arg('centro'))          # [x1, y1, x2, y2, ...]
     zone = {'density': dens, 'center': center, 'sigma': float(arg('sigma')),
             'peak': float(arg('pico'))}
     k = float(arg('k'))

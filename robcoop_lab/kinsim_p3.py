@@ -114,12 +114,16 @@ def main():
     p.add_argument('-n', type=int, default=3, help='número de robots (2 a 4)')
     p.add_argument('--fallo', type=int, default=None,
                    help='número del robot que se avería tras el despliegue (p. ej. 1)')
+    p.add_argument('--centro', default=None,
+                   help='con --densidad zona: "x,y" o varias zonas "x1,y1;x2,y2" (0.6,-0.6)')
     p.add_argument('--plot', action='store_true', help='mostrar gráficas')
     a = p.parse_args()
 
-    r = simulate(a.salida, a.n, a.densidad, a.k, fail=a.fallo)
+    center = core.parse_centers(a.centro) if a.centro else core.ZONE_CENTER
+    r = simulate(a.salida, a.n, a.densidad, a.k, fail=a.fallo, center=center)
     tc = f'{r["t_conv"]:.1f} s' if r['t_conv'] is not None else 'NO CONVERGE'
-    print(f'{a.salida} · {a.densidad} · {a.n} robots · k={a.k}')
+    print(f'{a.salida} · {a.densidad} · {a.n} robots · k={a.k}'
+          + (f' · centro {a.centro}' if a.centro and a.densidad == 'zona' else ''))
     print(f'  despliegue: {tc}   coste H: {r["cost"][0]:.2f} -> {r["final_cost"]:.2f} m⁴   '
           f'distancia media a un robot: {r["rms"]:.2f} m')
     if a.fallo is not None:
